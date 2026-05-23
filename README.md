@@ -1,2 +1,758 @@
-# Site-para-Gremio-Estudantil
-Um site feito para o partido Aliança, que está concorrendo para o Gremio da escola
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Partido Aliança - E.E. Pedro II</title>
+    <!-- Tailwind CSS para o design -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons para os ícones -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; -webkit-tap-highlight-color: transparent; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .fade-in { animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Ajuste para o quadrado da logo no canto esquerdo */
+        .logo-box {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Transições suaves para os carrosséis internos */
+        .smooth-transition {
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        /* Modal de detalhes do projeto: transição suave */
+        #project-modal {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        #project-modal.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        #project-modal > div {
+            transform: translateY(18px);
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+        #project-modal.show > div {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        /* Ocultar barra de rolagem no menu mobile mas permitir scroll */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 overflow-x-hidden">
+
+    <!-- Cabeçalho / Navbar -->
+    <header class="bg-[#0848ad] sticky top-0 z-40 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-20">
+            
+            <!-- LOGO -->
+            <div class="flex items-center gap-4 cursor-pointer" onclick="showTab('home')">
+                <div class="logo-box flex-shrink-0">
+                    <img src="https://lh3.googleusercontent.com/pw/AP1GczObKx-YUhHnlxHS_CEYsQbcrjeczI74UahKPAHZadfV45EOqVtetHODHZy_HQFSILcVpHYiJwCYSx7MQ9Zd9DWpKPZP7uAWBVu0_ssUgnbRqq3670jJ=w2400" class="w-full h-full object-cover rounded-lg" alt="Logo Partido Aliança">
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-white font-bold text-lg md:text-xl leading-tight uppercase tracking-tight">Partido Aliança</span>
+                    <span class="text-blue-200 text-xs md:text-sm font-medium">E.E. Pedro II</span>
+                </div>
+            </div>
+            
+            <!-- Menu Desktop -->
+            <nav class="hidden md:flex space-x-1 text-white font-semibold text-sm lg:text-base items-center">
+                <button onclick="showTab('home')" class="nav-btn px-3 py-2 rounded-lg hover:bg-white/10 transition" data-tab="home">Início</button>
+                <button onclick="showTab('about')" class="nav-btn px-3 py-2 rounded-lg hover:bg-white/10 transition" data-tab="about">Sobre</button>
+                <button onclick="showTab('history')" class="nav-btn px-3 py-2 rounded-lg hover:bg-white/10 transition" data-tab="history">Nossa História</button>
+                <button onclick="showTab('docs')" class="nav-btn px-3 py-2 rounded-lg hover:bg-white/10 transition" data-tab="docs">Transparência</button>
+                <button onclick="showTab('projects')" class="nav-btn px-3 py-2 rounded-lg hover:bg-white/10 transition" data-tab="projects">Projetos</button>
+                <button onclick="showTab('join')" class="nav-btn ml-2 px-5 py-2 bg-[#fbbf5b] text-[#0848ad] rounded-full hover:bg-yellow-400 transition shadow-md" data-tab="join">Participar</button>
+            </nav>
+
+            <!-- Menu Mobile (Hamburguer) -->
+            <button onclick="toggleMobileMenu()" class="md:hidden text-white p-2 rounded-lg hover:bg-white/10 transition focus:outline-none focus:ring-2 focus:ring-white/50">
+                <i data-lucide="menu" class="w-7 h-7"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Overlay e Menu Mobile Deslizante -->
+    <div id="mobile-menu-overlay" class="fixed inset-0 bg-black/60 z-50 hidden opacity-0 transition-opacity duration-300 backdrop-blur-sm" onclick="toggleMobileMenu()"></div>
+    
+    <div id="mobile-menu-panel" class="fixed top-0 right-0 bottom-0 w-72 bg-[#0848ad] z-50 transform translate-x-full transition-transform duration-300 ease-in-out shadow-2xl flex flex-col no-scrollbar overflow-y-auto border-l border-blue-800">
+        <div class="flex items-center justify-between p-6 border-b border-blue-800/50">
+            <span class="text-white font-bold text-lg uppercase tracking-tight">Menu</span>
+            <button onclick="toggleMobileMenu()" class="text-white p-2 bg-white/10 rounded-full hover:bg-white/20 transition">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+        </div>
+        <nav class="flex flex-col p-4 space-y-2 mt-2">
+            <button onclick="showTab('home'); toggleMobileMenu()" class="mobile-nav-btn text-left px-4 py-4 rounded-xl text-white font-bold text-lg hover:bg-white/10 transition flex items-center gap-3" data-tab="home"><i data-lucide="home" class="w-5 h-5 text-blue-300"></i> Início</button>
+            <button onclick="showTab('about'); toggleMobileMenu()" class="mobile-nav-btn text-left px-4 py-4 rounded-xl text-white font-bold text-lg hover:bg-white/10 transition flex items-center gap-3" data-tab="about"><i data-lucide="users" class="w-5 h-5 text-blue-300"></i> Sobre Nós</button>
+            <button onclick="showTab('history'); toggleMobileMenu()" class="mobile-nav-btn text-left px-4 py-4 rounded-xl text-white font-bold text-lg hover:bg-white/10 transition flex items-center gap-3" data-tab="history"><i data-lucide="book-open" class="w-5 h-5 text-blue-300"></i> Nossa História</button>
+            <button onclick="showTab('docs'); toggleMobileMenu()" class="mobile-nav-btn text-left px-4 py-4 rounded-xl text-white font-bold text-lg hover:bg-white/10 transition flex items-center gap-3" data-tab="docs"><i data-lucide="file-text" class="w-5 h-5 text-blue-300"></i> Transparência</button>
+            <button onclick="showTab('projects'); toggleMobileMenu()" class="mobile-nav-btn text-left px-4 py-4 rounded-xl text-white font-bold text-lg hover:bg-white/10 transition flex items-center gap-3" data-tab="projects"><i data-lucide="rocket" class="w-5 h-5 text-blue-300"></i> Projetos</button>
+            
+            <div class="h-px bg-blue-800/50 my-4 mx-4"></div>
+            
+            <button onclick="showTab('join'); toggleMobileMenu()" class="mobile-nav-btn text-center mt-2 px-6 py-4 bg-[#fbbf5b] text-[#0848ad] rounded-xl font-black text-lg hover:bg-yellow-400 transition shadow-lg" data-tab="join">QUERO PARTICIPAR</button>
+        </nav>
+    </div>
+
+    <!-- Conteúdo das Páginas -->
+    <main id="content">
+        
+        <!-- ================= PÁGINA INICIAL ================= -->
+        <section id="home" class="tab-content active fade-in">
+            <div class="bg-[#0848ad] text-white pt-12 pb-20 md:pt-16 md:pb-24 px-4 sm:px-6 text-center rounded-b-[30px] md:rounded-b-[40px] shadow-inner">
+                <h1 class="text-4xl sm:text-5xl md:text-7xl font-black mb-4 md:mb-6 tracking-tighter">
+                    Partido <span class="text-[#fbbf5b]">Aliança</span>
+                </h1>
+                <p class="text-lg md:text-2xl font-light text-blue-100 max-w-2xl mx-auto leading-relaxed px-2">
+                    Unindo vozes para transformar a nossa escola. O partido feito por alunos, para alunos.
+                </p>
+                <div class="mt-8 md:mt-10 flex flex-col md:flex-row justify-center gap-4 px-4 sm:px-10 md:px-0">
+                    <button onclick="showTab('join')" class="w-full md:w-auto px-8 md:px-10 py-4 bg-[#fbbf5b] text-[#0848ad] font-extrabold rounded-full shadow-2xl hover:scale-105 active:scale-95 transition text-base md:text-lg">QUERO PARTICIPAR</button>
+                    <button onclick="showTab('about')" class="w-full md:w-auto px-8 md:px-10 py-4 border-2 border-white/30 text-white font-bold rounded-full hover:bg-white/10 active:bg-white/20 transition text-base md:text-lg">CONHECER MAIS</button>
+                </div>
+            </div>
+
+            <!-- Carrossel Principal -->
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 -mt-10 md:-mt-12">
+                <div class="relative h-[250px] sm:h-[350px] md:h-[550px] rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl border-4 border-white bg-gray-200 group touch-pan-y">
+                    <img id="main-carousel-img" src="https://lh3.googleusercontent.com/pw/AP1GczPkduxD4ODwenyKZEb0jM3uejv-nzvUd7P_NUYXmXhB6qPL-tgMyAvnIJ4rSmUaeJWLy-_V9Z6sFewH7cRQChRoaC3RWuOxf0o5ntkaiMNC2Hxl0btt=w2400" class="w-full h-full object-cover transition-opacity duration-500">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 md:via-transparent to-transparent flex items-end p-6 md:p-10">
+                        <p id="main-carousel-text" class="text-white text-xl sm:text-2xl md:text-3xl font-bold border-l-4 border-[#fbbf5b] pl-4 md:pl-6 italic drop-shadow-md">Juntos por uma escola melhor</p>
+                    </div>
+                    <!-- Botões de navegação: Ocultos em telas muito pequenas a menos que interaja, mas presentes -->
+                    <button onclick="prevMainSlide()" class="absolute left-2 md:left-6 top-1/2 -translate-y-1/2 bg-black/30 md:bg-white/20 backdrop-blur-md p-2 md:p-4 rounded-full text-white hover:bg-black/50 md:hover:bg-white/40 transition active:scale-90"><i data-lucide="chevron-left" class="w-6 h-6 md:w-8 md:h-8"></i></button>
+                    <button onclick="nextMainSlide()" class="absolute right-2 md:right-6 top-1/2 -translate-y-1/2 bg-black/30 md:bg-white/20 backdrop-blur-md p-2 md:p-4 rounded-full text-white hover:bg-black/50 md:hover:bg-white/40 transition active:scale-90"><i data-lucide="chevron-right" class="w-6 h-6 md:w-8 md:h-8"></i></button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= SOBRE NÓS ================= -->
+        <section id="about" class="tab-content fade-in py-12 md:py-16 px-4 sm:px-6 max-w-6xl mx-auto">
+            <!-- Nossa Identidade -->
+            <h2 class="text-3xl md:text-4xl font-black text-[#0848ad] text-center mb-10 md:mb-16 uppercase italic">Nossa Identidade</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-10 mb-16 md:mb-24">
+                <div class="bg-white p-8 md:p-10 rounded-[2rem] shadow-xl border-b-8 border-[#fbbf5b] hover:translate-y-[-5px] transition">
+                    <div class="w-14 h-14 bg-blue-100 text-[#0848ad] rounded-2xl flex items-center justify-center mb-6">
+                        <i data-lucide="target" class="w-8 h-8"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-[#0848ad] mb-3 md:mb-4">Missão</h3>
+                    <p class="text-gray-600 leading-relaxed text-base md:text-lg">Resolver os problemas da escola de forma pragmática.</p>
+                </div>
+                <div class="bg-white p-8 md:p-10 rounded-[2rem] shadow-xl border-b-8 border-[#0848ad] hover:translate-y-[-5px] transition">
+                    <div class="w-14 h-14 bg-yellow-100 text-yellow-600 rounded-2xl flex items-center justify-center mb-6">
+                        <i data-lucide="eye" class="w-8 h-8"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-[#0848ad] mb-3 md:mb-4">Visão</h3>
+                    <p class="text-gray-600 leading-relaxed text-base md:text-lg">Ser referência em gestão estudantil, agindo como a ponte direta entre a direção da escola e os alunos.</p>
+                </div>
+                <div class="bg-white p-8 md:p-10 rounded-[2rem] shadow-xl border-b-8 border-[#fbbf5b] hover:translate-y-[-5px] transition">
+                    <div class="w-14 h-14 bg-blue-100 text-[#0848ad] rounded-2xl flex items-center justify-center mb-6">
+                        <i data-lucide="shield-check" class="w-8 h-8"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-[#0848ad] mb-3 md:mb-4">Valores</h3>
+                    <p class="text-gray-600 leading-relaxed text-base md:text-lg">Transparência absoluta, união entre as turmas, respeito mútuo e compromisso real com o futuro.</p>
+                </div>
+            </div>
+
+
+                     <!-- Conheça a Equipe (Carrossel) -->
+            <h2 class="text-3xl md:text-4xl font-black text-[#0848ad] text-center mb-8 md:mb-12 uppercase italic">Conheça a Equipe</h2>
+
+            <!-- Carrossel do Partido -->
+            <div class="bg-white rounded-3xl md:rounded-[3rem] shadow-2xl overflow-hidden border border-gray-100 max-w-5xl mx-auto relative mb-10">
+                <div class="p-6 md:p-8 border-b border-gray-100">
+                    <h3 class="text-2xl md:text-3xl font-extrabold text-[#0848ad]">Partido</h3>
+                </div>
+                <div id="team-party-container" class="flex flex-col md:flex-row smooth-transition">
+                    <div class="w-full p-8 sm:p-10 md:p-16 flex flex-col justify-center bg-gradient-to-br from-white to-blue-50">
+                        <span id="team-party-role" class="text-[#fbbf5b] font-black tracking-widest uppercase text-xs md:text-sm mb-2">Presidente do Partido</span>
+                        <h3 id="team-party-name" class="text-3xl md:text-4xl font-bold text-[#0848ad] mb-4 md:mb-6">Gabriel Reis</h3>
+                        <p id="team-party-desc" class="text-gray-600 text-base md:text-lg leading-relaxed mb-8 md:mb-8">O líder do partido que coordena as ações e valores do grupo.</p>
+                        <div class="flex gap-3 md:gap-4 mt-auto">
+                            <button onclick="prevTeamParty()" class="flex-1 md:flex-none flex justify-center items-center p-4 rounded-2xl md:rounded-full bg-white shadow-md text-[#0848ad] hover:bg-blue-50 active:bg-blue-100 transition border border-gray-100"><i data-lucide="arrow-left"></i></button>
+                            <button onclick="nextTeamParty()" class="flex-1 md:flex-none flex justify-center items-center p-4 rounded-2xl md:rounded-full bg-[#0848ad] shadow-md text-white hover:bg-blue-800 active:bg-blue-900 transition"><i data-lucide="arrow-right"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Carrossel da Chapa -->
+            <div class="bg-white rounded-3xl md:rounded-[3rem] shadow-2xl overflow-hidden border border-gray-100 max-w-5xl mx-auto">
+                <div class="p-6 md:p-8 border-b border-gray-100">
+                    <h3 class="text-2xl md:text-3xl font-extrabold text-[#0848ad]">Chapa</h3>
+                </div>
+                <div id="team-chapa-container" class="flex flex-col md:flex-row smooth-transition">
+                    <div class="w-full p-8 sm:p-10 md:p-16 flex flex-col justify-center bg-gradient-to-br from-white to-blue-50">
+                        <span id="team-chapa-role" class="text-[#fbbf5b] font-black tracking-widest uppercase text-xs md:text-sm mb-2">Presidente da Chapa</span>
+                        <h3 id="team-chapa-name" class="text-3xl md:text-4xl font-bold text-[#0848ad] mb-4 md:mb-6">Júlia Tavares</h3>
+                        <p id="team-chapa-desc" class="text-gray-600 text-base md:text-lg leading-relaxed mb-8 md:mb-8">O responsável por liderar a chapa e executar a visão do partido.</p>
+                        <div class="flex gap-3 md:gap-4 mt-auto">
+                            <button onclick="prevTeamChapa()" class="flex-1 md:flex-none flex justify-center items-center p-4 rounded-2xl md:rounded-full bg-white shadow-md text-[#0848ad] hover:bg-blue-50 active:bg-blue-100 transition border border-gray-100"><i data-lucide="arrow-left"></i></button>
+                            <button onclick="nextTeamChapa()" class="flex-1 md:flex-none flex justify-center items-center p-4 rounded-2xl md:rounded-full bg-[#0848ad] shadow-md text-white hover:bg-blue-800 active:bg-blue-900 transition"><i data-lucide="arrow-right"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= NOSSA HISTÓRIA ================= -->
+        <section id="history" class="tab-content fade-in py-12 md:py-16 px-4 sm:px-6 max-w-6xl mx-auto">
+            
+            <!-- Introdução -->
+            <div class="flex flex-col md:flex-row items-center gap-8 md:gap-12 mb-16 md:mb-24">
+                <div class="w-full md:w-1/2">
+                    <h2 class="text-3xl md:text-4xl font-black text-[#0848ad] mb-4 md:mb-6 uppercase italic">Como Tudo Começou</h2>
+                    <p class="text-gray-600 text-base md:text-lg leading-relaxed mb-4">
+                        A ideia do Partido Aliança não surgiu da noite para o dia. Tudo começou num intervalo, quando um grupo de alunos percebeu que a nossa escola precisava de mais cor, mais eventos e de uma voz mais ativa nas decisões importantes.
+                    </p>
+                    <p class="text-gray-600 text-base md:text-lg leading-relaxed">
+                        A gente queria mudar a forma como o grêmio funcionava, trazendo transparência de verdade e projetos que a galera realmente quisesse participar.
+                    </p>
+                </div>
+                <!-- Imagem menor no mobile -->
+                <div class="w-full md:w-1/2 h-64 md:h-80 rounded-3xl overflow-hidden shadow-xl border-4 border-[#fbbf5b]">
+                    <img src="https://lh3.googleusercontent.com/pw/AP1GczMfa2m5x58hMwdJwVfNvXROgGopd4J59wDy9aGvnVREdtu507BNY1cbkBfHHDfExW0OL54Sh1yMu3uRDN3q5Sn96oalEC4DnOI3vxTktPBO8ao1WFHT=w2400" class="w-full h-full object-cover" alt="Foto com todos os alunos da campanha">
+                </div>
+            </div>
+
+            <!-- Primeiros Passos -->
+            <div class="flex flex-col md:flex-row-reverse items-center gap-8 md:gap-12 mb-16 md:mb-24 bg-white p-6 sm:p-8 md:p-12 rounded-[2rem] md:rounded-[3rem] shadow-lg border border-gray-100">
+                <div class="w-full md:w-1/2">
+                    <h3 class="text-2xl md:text-3xl font-bold text-[#0848ad] mb-4 md:mb-6">Os Primeiros Passos e Desafios</h3>
+                    <p class="text-gray-600 text-base md:text-lg leading-relaxed mb-4">
+                        Formar a equipe foi o primeiro grande desafio. Precisávamos de pessoas comprometidas de diferentes salas e anos. Fizemos reuniões no pátio, juntamos ideias num caderno velho e aos poucos fomos construindo as nossas propostas.
+                    </p>
+                    <p class="text-gray-600 text-base md:text-lg leading-relaxed">
+                        Enfrentamos a dificuldade de organizar o tempo entre os estudos e a criação da chapa, mas a vontade de ver a escola melhor superou o cansaço. Conseguimos reunir uma equipe incrível e pronta para fazer acontecer!
+                    </p>
+                </div>
+                <div class="w-full md:w-1/2 grid grid-cols-2 gap-3 md:gap-4">
+                    <img src="https://lh3.googleusercontent.com/pw/AP1GczOYIWT9S8Fr_WqChhLAHKST5og38zpnc4QER111VACiF2-ceRotzyiqk-OEttYvJBLJaF3A9oZ1QKiY-CivTFx_xLhFshfr3SDzIEI8iadbH_imtz4r=w2400" class="w-full h-32 md:h-48 object-cover rounded-2xl shadow-md" alt="1° Campanha">
+                    <img src="https://lh3.googleusercontent.com/pw/AP1GczN-n06b5xUZ032xZPKzP9yBK2_X3oawjS0foYsyGhuJFPw7v44mn7U9voztf9s5-3WQvxObH8LFMBzWDHxx2JxDItxshVcdZhaM1REC19dXaWnFDUYA=w2400" class="w-full h-32 md:h-48 object-cover rounded-2xl shadow-md mt-6 md:mt-8" alt="1° Campanha">
+                </div>
+            </div>
+
+            <!-- 1ª Eleição -->
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-8">
+                    <span class="bg-blue-100 text-[#0848ad] px-4 py-2 rounded-full font-bold uppercase tracking-widest text-xs md:text-sm mb-4 inline-block">Um Marco Histórico</span>
+                    <h3 class="text-3xl md:text-4xl font-black text-[#0848ad]">A Nossa 1ª Eleição</h3>
+                </div>
+                <div class="flex flex-col lg:flex-row gap-8 lg:gap-12 items-start">
+                    <div class="w-full lg:w-2/3">
+                        <p class="text-gray-600 text-base md:text-xl leading-relaxed mb-8 text-left">
+                            A semana de campanha foi uma loucura! Passamos em todas as salas, distribuímos os nossos panfletos e participamos do debate escolar. Apresentar as nossas ideias de frente para toda a escola deu um frio na barriga, mas o apoio que recebemos dos alunos foi o que nos deu a certeza de que estávamos no caminho certo.
+                        </p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+                            <div class="h-56 md:h-64 rounded-3xl overflow-hidden shadow-xl">
+                                <img src="https://lh3.googleusercontent.com/pw/AP1GczNSuY4gD33pLkSIucquwr-q1UW4NtYcWtJvw3fT95HHdu1apdSQ5d305ZBgwqiOYw_mpv5xptA1O047gnVjtr9jWDnVtFwekbEsAVfSqvpCtsFm8KA7=w2400" class="w-full h-full object-cover" alt="Debate escolar">
+                            </div>
+                            <div class="h-56 md:h-64 rounded-3xl overflow-hidden shadow-xl">
+                                <img src="https://lh3.googleusercontent.com/pw/AP1GczMaowSJbXI3ebbZatw2aIL8msF7vOLa8Y3RbaF4h_3FGu5kk7C1uSAt7Qd_PEk44XR5nrS7RLXLwvBygnl9oL9UU8RBtYyy_7hYxio3tb-B__GFACJD=w2400" class="w-full h-full object-cover" alt="Alunos Na Campanha">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-full lg:w-1/3">
+                        <div class="aspect-[9/16] bg-gray-200 rounded-3xl overflow-hidden shadow-xl flex items-center justify-center">
+                            <iframe width="100%" height="100%" src="Vídeos/14.mp4" frameborder="0" allowfullscreen></iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= DOCUMENTAÇÃO ================= -->
+        <section id="docs" class="tab-content fade-in py-12 md:py-16 px-4 sm:px-6 max-w-4xl mx-auto">
+            <h2 class="text-3xl md:text-4xl font-black text-[#0848ad] text-center mb-10 md:mb-12 uppercase italic">Portal da Transparência</h2>
+            <div class="bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
+                <div class="bg-[#0848ad] p-6 md:p-8 text-white flex items-center gap-3 md:gap-4">
+                    <i data-lucide="file-text" class="w-6 h-6 md:w-8 md:h-8 flex-shrink-0"></i>
+                    <h3 class="font-bold text-xl md:text-2xl">Repositório de Documentos</h3>
+                </div>
+                <div class="divide-y divide-gray-100">
+                    <!-- Doc 1 -->
+                    <div class="p-6 md:p-8 flex flex-col md:flex-row justify-between items-start md:items-center hover:bg-blue-50 transition gap-4 md:gap-4">
+                        <div>
+                            <p class="font-bold text-base md:text-lg text-gray-800 leading-tight mb-1">Estatuto Oficial Aliança</p>
+                            <p class="text-xs md:text-sm text-gray-500">PDF • Atualizado em Março 2026</p>
+                        </div>
+                        <a href="https://drive.google.com/file/d/18uIKEmX64VwLau--O2oNuHkY4BKJ41IS/view?usp=sharing" target="_blank" rel="noopener noreferrer" class="w-full md:w-auto text-center px-6 py-3 md:py-3 bg-[#0848ad] text-white rounded-xl font-bold shadow-md hover:bg-blue-800 active:bg-blue-900 transition whitespace-nowrap text-sm md:text-base">VER MAIS</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= PROJETOS ================= -->
+        <section id="projects" class="tab-content fade-in py-12 md:py-16 px-4 sm:px-6 max-w-7xl mx-auto">
+            
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-2 md:gap-4">
+                <h2 class="text-3xl md:text-4xl font-black text-[#0848ad] uppercase italic">Nossos Projetos</h2>
+                <p class="text-gray-500 font-medium text-base md:text-lg">Veja o que estamos construindo.</p>
+            </div>
+
+            <!-- LEGENDA - Otimizada para mobile (wrap e espaçamentos) -->
+            <div class="bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-gray-100 mb-8 md:mb-12 flex flex-col md:flex-row md:flex-wrap gap-4 md:gap-6 md:items-center">
+                <span class="font-bold text-gray-700 text-sm md:text-base">Status dos Projetos:</span>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div class="flex items-center gap-2 bg-orange-50 md:bg-transparent px-3 py-2 md:p-0 rounded-lg">
+                        <div class="w-4 h-4 rounded-full bg-orange-500 flex-shrink-0"></div>
+                        <span class="text-xs md:text-sm font-medium text-gray-700">Planejamento</span>
+                    </div>
+                    <div class="flex items-center gap-2 bg-yellow-50 md:bg-transparent px-3 py-2 md:p-0 rounded-lg">
+                        <div class="w-4 h-4 rounded-full bg-yellow-400 flex-shrink-0"></div>
+                        <span class="text-xs md:text-sm font-medium text-gray-700">Em Andamento</span>
+                    </div>
+                    <div class="flex items-center gap-2 bg-green-50 md:bg-transparent px-3 py-2 md:p-0 rounded-lg">
+                        <div class="w-4 h-4 rounded-full bg-green-500 flex-shrink-0"></div>
+                        <span class="text-xs md:text-sm font-medium text-gray-700">Concluído</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GRID DE PROJETOS -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                
+                <!-- Card 1 -->
+                <div class="bg-white rounded-3xl shadow-md overflow-hidden flex flex-col border border-gray-100 hover:shadow-xl transition">
+                    <img src="https://images.unsplash.com/photo-1478737270239-2f02b77ac6d5?w=500" class="w-full h-40 object-cover">
+                    <div class="p-5 md:p-6 flex flex-col flex-grow">
+                        <span class="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest w-max mb-3">Planejamento</span>
+                        <h3 class="font-bold text-lg md:text-xl text-gray-800 mb-2">Alunos Destaques</h3>
+                        <p class="text-gray-600 text-sm mb-6 flex-grow">Certificados de aluno destaque para todas as turmas!</p>
+                        <div class="flex gap-2">
+                            <button type="button" onclick="openProjectModal('Alunos Destaques', 'Certificados de aluno destaque para todas as turmas, reconhecendo o esforço acadêmico e social dos estudantes.')" class="flex-1 text-center py-2.5 bg-gray-100 text-gray-700 font-bold rounded-xl hover:bg-gray-200 active:bg-gray-300 transition text-sm">Detalhes</button>
+                            <a href="#" class="flex-1 text-center py-2.5 bg-blue-50 text-[#0848ad] font-bold rounded-xl hover:bg-blue-100 active:bg-blue-200 transition text-sm border border-blue-200">Feedback</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="bg-white rounded-3xl shadow-md overflow-hidden flex flex-col border border-gray-100 hover:shadow-xl transition">
+                    <img src="https://images.unsplash.com/photo-1478737270239-2f02b77ac6d5?w=500" class="w-full h-40 object-cover">
+                    <div class="p-5 md:p-6 flex flex-col flex-grow">
+                        <span class="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest w-max mb-3">Planejamento</span>
+                        <h3 class="font-bold text-lg md:text-xl text-gray-800 mb-2">Pedro II Limpo</h3>
+                        <p class="text-gray-600 text-sm mb-6 flex-grow">Projeto para manter nossa escola limpa.</p>
+                        <div class="flex gap-2">
+                            <button type="button" onclick="openProjectModal('Pedro II Limpo', 'Ação contínua de conscientização e mutirões para manter o ambiente escolar limpo e agradável.')" class="flex-1 text-center py-2.5 bg-gray-100 text-gray-700 font-bold rounded-xl hover:bg-gray-200 active:bg-gray-300 transition text-sm">Detalhes</button>
+                            <a href="#" class="flex-1 text-center py-2.5 bg-blue-50 text-[#0848ad] font-bold rounded-xl hover:bg-blue-100 active:bg-blue-200 transition text-sm border border-blue-200">Feedback</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="bg-white rounded-3xl shadow-md overflow-hidden flex flex-col border border-gray-100 hover:shadow-xl transition">
+                    <img src="https://images.unsplash.com/photo-1511629091441-ee46146481b6?w=500" class="w-full h-40 object-cover">
+                    <div class="p-5 md:p-6 flex flex-col flex-grow">
+                        <span class="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest w-max mb-3">Planejamento</span>
+                        <h3 class="font-bold text-lg md:text-xl text-gray-800 mb-2">Mural de Arte</h3>
+                        <p class="text-gray-600 text-sm mb-6 flex-grow">Mural de Arte.</p>
+                        <div class="flex gap-2">
+                            <button type="button" onclick="openProjectModal('Mural de Arte', 'Criar um mural colaborativo na escola com intervenções artísticas dos alunos para fortalecer cultura e identidade.')" class="flex-1 text-center py-2.5 bg-gray-100 text-gray-700 font-bold rounded-xl hover:bg-gray-200 active:bg-gray-300 transition text-sm">Detalhes</button>
+                            <a href="#" class="flex-1 text-center py-2.5 bg-blue-50 text-[#0848ad] font-bold rounded-xl hover:bg-blue-100 active:bg-blue-200 transition text-sm border border-blue-200">Feedback</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="bg-white rounded-3xl shadow-md overflow-hidden flex flex-col border border-gray-100 hover:shadow-xl transition">
+                    <img src="https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?w=500" class="w-full h-40 object-cover">
+                    <div class="p-5 md:p-6 flex flex-col flex-grow">
+                        <span class="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest w-max mb-3">Planejamento</span>
+                        <h3 class="font-bold text-lg md:text-xl text-gray-800 mb-2">Clube do Livro</h3>
+                        <p class="text-gray-600 text-sm mb-6 flex-grow">Um espaço na biblioteca para debatermos livros. Ainda estamos definindo os horários.</p>
+                        <div class="flex gap-2">
+                            <button type="button" onclick="openProjectModal('Clube do Livro', 'Debates literários na biblioteca com turmas de diferentes séries, promovendo leitura crítica e acesso a diversos gêneros.')" class="flex-1 text-center py-2.5 bg-gray-100 text-gray-700 font-bold rounded-xl hover:bg-gray-200 active:bg-gray-300 transition text-sm">Detalhes</button>
+                            <a href="#" class="flex-1 text-center py-2.5 bg-blue-50 text-[#0848ad] font-bold rounded-xl hover:bg-blue-100 active:bg-blue-200 transition text-sm border border-blue-200">Feedback</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 5 (Mais Projetos) -->
+                <div class="bg-white rounded-3xl shadow-md overflow-hidden flex flex-col border border-gray-100 hover:shadow-xl transition">
+                    <img src="https://images.unsplash.com/photo-1606326608606-aa0b62935f2b?w=500" class="w-full h-40 object-cover">
+                    <div class="p-5 md:p-6 flex flex-col flex-grow">
+                        <span class="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest w-max mb-3">Planejamento</span>
+                        <h3 class="font-bold text-lg md:text-xl text-gray-800 mb-2">Avaliação e Mapeamento</h3>
+                        <p class="text-gray-600 text-sm mb-6 flex-grow">Avaliação e mapeamento.</p>
+                        <div class="flex gap-2">
+                            <button type="button" onclick="openProjectModal('Avaliação e Mapeamento', 'Ferramenta para avaliar necessidades da escola e mapear prioridades de projetos com a participação dos alunos.')" class="flex-1 text-center py-2.5 bg-gray-100 text-gray-700 font-bold rounded-xl hover:bg-gray-200 active:bg-gray-300 transition text-sm">Detalhes</button>
+                            <a href="#" class="flex-1 text-center py-2.5 bg-blue-50 text-[#0848ad] font-bold rounded-xl hover:bg-blue-100 active:bg-blue-200 transition text-sm border border-blue-200">Feedback</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 6 -->
+                <div class="bg-white rounded-3xl shadow-md overflow-hidden flex flex-col border border-gray-100 hover:shadow-xl transition">
+                    <img src="https://images.unsplash.com/photo-1577896851231-70ef18881754?w=500" class="w-full h-40 object-cover">
+                    <div class="p-5 md:p-6 flex flex-col flex-grow">
+                        <span class="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest w-max mb-3">Planejamento</span>
+                        <h3 class="font-bold text-lg md:text-xl text-gray-800 mb-2">Destaques do Simulado</h3>
+                        <p class="text-gray-600 text-sm mb-6 flex-grow">Destaques do simulado.</p>
+                        <div class="flex gap-2">
+                            <button type="button" onclick="openProjectModal('Destaques do Simulado', 'Reconhecimento dos alunos com melhores resultados no simulado para incentivar a dedicação e estudo.')" class="flex-1 text-center py-2.5 bg-gray-100 text-gray-700 font-bold rounded-xl hover:bg-gray-200 active:bg-gray-300 transition text-sm">Detalhes</button>
+                            <a href="#" class="flex-1 text-center py-2.5 bg-blue-50 text-[#0848ad] font-bold rounded-xl hover:bg-blue-100 active:bg-blue-200 transition text-sm border border-blue-200">Feedback</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Modal de descrição de projeto -->
+        <div id="project-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+            <div class="bg-white rounded-3xl shadow-2xl max-w-2xl w-full p-6 md:p-8 relative">
+                <button onclick="closeProjectModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-900"><i data-lucide="x" class="w-6 h-6"></i></button>
+                <h3 id="project-modal-title" class="text-2xl md:text-3xl font-black text-[#0848ad] mb-4">Detalhes do Projeto</h3>
+                <p id="project-modal-desc" class="text-gray-600 text-sm md:text-base leading-relaxed"></p>
+            </div>
+        </div>
+
+        <!-- ================= PARTICIPAR ================= -->
+        <section id="join" class="tab-content fade-in py-12 md:py-16 px-4 sm:px-6 max-w-6xl mx-auto">
+            
+            <!-- Introdução aos Cargos -->
+            <div class="text-center mb-10 md:mb-16 max-w-3xl mx-auto">
+                <h2 class="text-3xl md:text-4xl font-black text-[#0848ad] mb-4 md:mb-6 uppercase italic">Como funciona o Grêmio?</h2>
+                <p class="text-base md:text-xl text-gray-600 leading-relaxed">
+                    O Grêmio não é feito só da presidência! Nós somos divididos em várias comissões essenciais. Dá uma olhada nas áreas onde você pode atuar e fazer a diferença junto com a gente:
+                </p>
+            </div>
+
+            <!-- Carrossel de Comissões -->
+            <div class="bg-white rounded-3xl md:rounded-[3rem] shadow-2xl overflow-hidden border border-gray-100 max-w-5xl mx-auto relative mb-16 md:mb-24">
+                <div id="committee-container" class="flex flex-col md:flex-row smooth-transition">
+                    <!-- Imagem -->
+                    <div class="w-full md:w-2/5 h-[240px] md:h-auto bg-gray-200 flex-shrink-0">
+                        <img id="com-img" src="" class="w-full h-full object-cover" alt="Equipe trabalhando">
+                    </div>
+                    <!-- Texto -->
+                    <div class="w-full md:w-3/5 p-8 md:p-16 flex flex-col justify-center bg-gradient-to-br from-white to-yellow-50">
+                        <div class="w-12 h-12 bg-[#fbbf5b] rounded-xl flex items-center justify-center text-white mb-4 md:mb-6">
+                            <i id="com-icon" data-lucide="megaphone" class="w-6 h-6"></i>
+                        </div>
+                        <h3 id="com-title" class="text-3xl md:text-4xl font-bold text-[#0848ad] mb-3 md:mb-4">Comunicação</h3>
+                        <p id="com-desc" class="text-gray-600 text-base md:text-lg leading-relaxed mb-8">
+                            A galera da Comunicação cuida de todo o nosso Instagram, faz os cartazes espalhados pela escola e garante que todo mundo saiba das novidades. Se você curte design, redes sociais ou tirar fotos, esse é o seu lugar!
+                        </p>
+                        <!-- Controles -->
+                        <div class="flex gap-3 md:gap-4 mt-auto">
+                            <button onclick="prevCommittee()" class="flex-1 md:flex-none flex justify-center items-center p-4 rounded-2xl md:rounded-full bg-white shadow-md text-[#fbbf5b] hover:bg-yellow-100 active:bg-yellow-200 transition border border-gray-100"><i data-lucide="arrow-left"></i></button>
+                            <button onclick="nextCommittee()" class="flex-1 md:flex-none flex justify-center items-center p-4 rounded-2xl md:rounded-full bg-[#fbbf5b] shadow-md text-[#0848ad] hover:bg-yellow-400 active:bg-yellow-500 transition"><i data-lucide="arrow-right"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vantagens e Vídeo -->
+            <div class="flex flex-col lg:flex-row gap-10 md:gap-12 mb-16 md:mb-24 items-center">
+                <!-- Vantagens -->
+                <div class="w-full lg:w-1/2 order-2 lg:order-1">
+                    <h3 class="text-2xl md:text-3xl font-bold text-[#0848ad] mb-6 md:mb-8 text-center md:text-left">Por que se filiar ao partido?</h3>
+                    <ul class="space-y-5 md:space-y-6">
+                        <li class="flex items-start gap-3 md:gap-4 bg-white p-4 md:p-0 rounded-2xl shadow-sm md:shadow-none md:bg-transparent border md:border-none border-gray-100">
+                            <div class="bg-blue-100 text-[#0848ad] p-3 rounded-xl flex-shrink-0 mt-1 md:mt-0"><i data-lucide="users" class="w-5 h-5 md:w-6 md:h-6"></i></div>
+                            <div>
+                                <h4 class="font-bold text-lg md:text-xl text-gray-800 mb-1">Fazer Novos Amigos</h4>
+                                <p class="text-gray-600 text-sm md:text-base">Você vai conhecer gente de todas as salas que tem os mesmos interesses que você.</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-3 md:gap-4 bg-white p-4 md:p-0 rounded-2xl shadow-sm md:shadow-none md:bg-transparent border md:border-none border-gray-100">
+                            <div class="bg-blue-100 text-[#0848ad] p-3 rounded-xl flex-shrink-0 mt-1 md:mt-0"><i data-lucide="mic" class="w-5 h-5 md:w-6 md:h-6"></i></div>
+                            <div>
+                                <h4 class="font-bold text-lg md:text-xl text-gray-800 mb-1">Voz Ativa na Escola</h4>
+                                <p class="text-gray-600 text-sm md:text-base">Ter as suas ideias ouvidas e aplicadas de verdade no dia a dia do colégio.</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-3 md:gap-4 bg-white p-4 md:p-0 rounded-2xl shadow-sm md:shadow-none md:bg-transparent border md:border-none border-gray-100">
+                            <div class="bg-blue-100 text-[#0848ad] p-3 rounded-xl flex-shrink-0 mt-1 md:mt-0"><i data-lucide="award" class="w-5 h-5 md:w-6 md:h-6"></i></div>
+                            <div>
+                                <h4 class="font-bold text-lg md:text-xl text-gray-800 mb-1">Experiência de Liderança</h4>
+                                <p class="text-gray-600 text-sm md:text-base">Aprender a organizar eventos e liderar projetos (ótimo para o currículo!).</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <!-- Vídeo Placeholder -->
+                <div class="w-full lg:w-1/2 order-1 lg:order-2">
+                    <div class="relative w-full aspect-video bg-gray-900 rounded-3xl md:rounded-[2rem] shadow-2xl overflow-hidden border-4 md:border-8 border-white flex items-center justify-center group cursor-pointer active:scale-95 transition-transform">
+                        <img src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=800&q=80" class="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-105 transition duration-500">
+                        <div class="relative z-10 w-16 h-16 md:w-20 md:h-20 bg-[#fbbf5b] rounded-full flex items-center justify-center text-[#0848ad] shadow-lg group-hover:scale-110 transition">
+                            <i data-lucide="play" class="w-8 h-8 md:w-10 md:h-10 ml-1 md:ml-2"></i>
+                        </div>
+                        <div class="absolute bottom-4 left-4 md:bottom-6 md:left-6 z-10">
+                            <p class="text-white font-bold text-base md:text-xl drop-shadow-md">Veja o nosso dia a dia!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Faça a sua parte (Chamada Final) -->
+            <div class="bg-gradient-to-br from-[#0848ad] to-blue-900 text-white p-8 sm:p-12 md:p-20 rounded-3xl md:rounded-[3rem] shadow-2xl text-center relative overflow-hidden border-4 border-[#fbbf5b]">
+                <h2 class="text-3xl sm:text-4xl md:text-5xl font-black mb-6 md:mb-8 italic uppercase relative z-10">Faça a sua parte!</h2>
+                <p class="text-base md:text-xl text-blue-100 mb-8 md:mb-12 leading-relaxed max-w-3xl mx-auto relative z-10">Não fique de fora. O Grêmio Aliança precisa de membros dedicados nas comissões. Quer sugerir algo ou ajudar a gente a construir uma escola melhor?</p>
+                <a href="#" class="relative z-10 w-full sm:w-auto inline-flex justify-center items-center gap-3 bg-[#fbbf5b] text-[#0848ad] px-8 md:px-12 py-4 md:py-5 rounded-full font-black text-lg md:text-2xl shadow-xl hover:scale-105 active:scale-95 transition">
+                    PREENCHER FORMULÁRIO <i data-lucide="arrow-right" class="w-6 h-6"></i>
+                </a>
+                <p class="mt-6 md:mt-8 text-xs md:text-sm text-blue-300 font-medium tracking-wide uppercase relative z-10">Entramos em contato pelo WhatsApp rapidinho!</p>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Rodapé -->
+    <footer class="bg-gray-900 text-white py-12 md:py-16 mt-16 md:mt-20 text-center border-t-8 border-[#fbbf5b]">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex flex-col items-center gap-4 md:gap-6 mb-8">
+            
+                 <h2 class="text-xl md:text-2xl font-bold tracking-tighter uppercase">Partido Estudantil Aliança</h2>
+            </div>
+            
+            <!-- Redes Sociais e Contatos -->
+            <div class="flex justify-center gap-4 mb-10">
+                <!-- Botão Instagram (com efeito de cores originais no hover) -->
+                <a href="https://www.instagram.com/gremio._alianca?igsh=MWs4NmFzbXR4YXZ5ZA==" target="_blank" rel="noopener noreferrer" class="bg-gray-800 p-3 md:p-4 rounded-full text-gray-400 hover:text-white hover:bg-gradient-to-tr hover:from-yellow-500 hover:via-pink-500 hover:to-purple-600 transition-all duration-300 shadow-lg transform hover:-translate-y-1">
+                    <svg class="w-6 h-6 md:w-7 md:h-7" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                    </svg>
+                    <span class="sr-only">Instagram</span>
+                </a>
+                
+                <!-- Botão WhatsApp -->
+                <a href="#" target="_blank" rel="noopener noreferrer" class="bg-gray-800 p-3 md:p-4 rounded-full text-gray-400 hover:text-white hover:bg-green-500 transition-all duration-300 shadow-lg transform hover:-translate-y-1">
+                    <i data-lucide="message-circle" class="w-6 h-6 md:w-7 md:h-7"></i>
+                    <span class="sr-only">WhatsApp</span>
+                </a>
+
+                <!-- Botão E-mail -->
+                <a href="#" class="bg-gray-800 p-3 md:p-4 rounded-full text-gray-400 hover:text-white hover:bg-blue-600 transition-all duration-300 shadow-lg transform hover:-translate-y-1">
+                    <i data-lucide="mail" class="w-6 h-6 md:w-7 md:h-7"></i>
+                    <span class="sr-only">E-mail</span>
+                </a>
+            </div>
+
+            <p class="text-gray-500 font-medium text-sm md:text-base">© 2026 • Escola Estadual Pedro II • Partido Aliança.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Gestão das Abas
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.getElementById(tabId).classList.add('active');
+            
+            // Desktop nav styles
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                if(btn.getAttribute('data-tab') === tabId) {
+                    btn.classList.add('text-[#fbbf5b]');
+                } else {
+                    btn.classList.remove('text-[#fbbf5b]');
+                }
+            });
+
+            // Mobile nav styles
+            document.querySelectorAll('.mobile-nav-btn').forEach(btn => {
+                if(btn.getAttribute('data-tab') === tabId) {
+                    btn.classList.add('bg-white/20');
+                    btn.classList.remove('bg-transparent');
+                } else {
+                    btn.classList.remove('bg-white/20');
+                    btn.classList.add('bg-transparent');
+                }
+            });
+
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        // ================= GESTÃO DO MENU MOBILE =================
+        function toggleMobileMenu() {
+            const overlay = document.getElementById('mobile-menu-overlay');
+            const panel = document.getElementById('mobile-menu-panel');
+            
+            if (overlay.classList.contains('hidden')) {
+                // Abrir
+                overlay.classList.remove('hidden');
+                setTimeout(() => {
+                    overlay.classList.remove('opacity-0');
+                    panel.classList.remove('translate-x-full');
+                    document.body.style.overflow = 'hidden'; 
+                }, 10);
+            } else {
+                // Fechar
+                overlay.classList.add('opacity-0');
+                panel.classList.add('translate-x-full');
+                document.body.style.overflow = ''; 
+                
+                setTimeout(() => {
+                    overlay.classList.add('hidden');
+                }, 300);
+            }
+        }
+
+        // ================= DADOS DO CARROSSEL PRINCIPAL =================
+        const mainSlides = [
+            { url: "https://lh3.googleusercontent.com/pw/AP1GczPkduxD4ODwenyKZEb0jM3uejv-nzvUd7P_NUYXmXhB6qPL-tgMyAvnIJ4rSmUaeJWLy-_V9Z6sFewH7cRQChRoaC3RWuOxf0o5ntkaiMNC2Hxl0btt=w2400", text: "Juntos por uma escola melhor" },
+            { url: "https://lh3.googleusercontent.com/pw/AP1GczPInwR4vORsb8Yw2af8nxX5mJ2YzdL7KZvykOc8o5eK_pQ9HzHMOViKUmnDBjD61Pn5Mg5laQjPpu3oBWgS9lBKfIRX_oiGZgnZtoxl-X-3jJJE7lsY=w2400", text: "Projetos que transformam a escola" },
+            { url: "https://lh3.googleusercontent.com/pw/AP1GczMGikf4vnpAzQ5hXiMSNbtTM4qTDI7JHd-x72JfTyjNQ1zUsNtg3a7TdlnrofgIyk_7yhcDhdtPYvwQUSIGvneRMXmupHxCTvI0rXJwwyIFLfxOhgPk=w2400", text: "A sua voz é o que nos move" }
+        ];
+        let currentMainSlide = 0;
+
+        function updateMainCarousel() {
+            const img = document.getElementById('main-carousel-img');
+            const text = document.getElementById('main-carousel-text');
+            img.style.opacity = '0';
+            setTimeout(() => {
+                img.src = mainSlides[currentMainSlide].url;
+                text.innerText = mainSlides[currentMainSlide].text;
+                img.style.opacity = '1';
+            }, 300);
+        }
+
+        function nextMainSlide() { currentMainSlide = (currentMainSlide + 1) % mainSlides.length; updateMainCarousel(); }
+        function prevMainSlide() { currentMainSlide = (currentMainSlide - 1 + mainSlides.length) % mainSlides.length; updateMainCarousel(); }
+
+        // ================= DADOS DA EQUIPE (CARROSSEL) =================
+        const partyData = [
+            { role: "Presidente do Partido", name: "Gabriel Reis", desc: "O líder que guia a estratégia do partido e preserva os valores do nosso movimento.", img: "https://lh3.googleusercontent.com/pw/AP1GczMJ151qWShB2xitCdQzJN84D7whc8Tdd4VWPiM0u6ouAQmZzfB5Difye1qncBvQZrNjvSIfX-jtrzG_B-n4ZIEKMhPYp5PUcTmfcAg27Qm4hM6Ba_7L=w2400" },
+            { role: "Vice do Partido", name: "Maria Eduarda Schneider", desc: "Suporte de liderança que garante continuidade e apoio nas decisões do partido.", img: "" },
+            { role: "Presidente de Honra", name: "Pedro Melado", desc: "Entrei na escola em 2020, no 6º ano do ensino fundamental. Desde então, atuei como representante de turma em todos os anos, com exceção de 2022, quando estava no 8º ano.\n\nEm 2023, criei e coordenei a Associação dos Representantes de Turma, iniciativa que, apesar de posteriormente descontinuada, marcou minha trajetória de liderança. Já em 2025, fundei e presidi o Partido Aliança, ao lado de Lucas Lima, com o objetivo de disputar o Grêmio Estudantil. No mesmo ano, fui candidato à presidência do Grêmio em uma eleição bastante disputada, que acabou sendo cancelada.\n\nAtualmente, exerço as funções de Presidente de Honra do Partido Aliança, representante da turma 301 e representante dos alunos no Colegiado Escolar.", img: "https://lh3.googleusercontent.com/pw/AP1GczN_eFKhVoJdTlVkxsSn3ncZIEpe-LoZBgbwVg8hUs81B1ZUn3o_V1QYQtwtftJ8LGBnwZRoyPPLxSzJEcyiMhGiXDBzI52jw6X4F3cmnoAf5S7lGf6O=w2400" },
+            { role: "Presidente de Honra", name: "Lucas Lima", desc: "Ex candidato para a presidência do partido Aliança junto com o Melado. Fotógrafo, programador do site e também fui DJ na campanha eleitoral de 2025, independente da situação, estou sempre me adaptando para ajudar o partido e para ajudar na escola.\n\nTudo começou com a Associação dos Representantes de Turma, em 2023, onde eu conheci o Melado, nessa época eu era vice representante, mas ainda procurava estar presente na Associação até a sua dissolução.\n\nEnfim, atuo como representante e membro do colegiado desde 2024, representante geral e candidato à presidência em 2025, agora sou presidente de honra do partido.", img: "https://lh3.googleusercontent.com/pw/AP1GczNAbh9SoElq6St8cMUtBFpitKK9cC52j4EU_S2oFdHiM0aHK1u1bRCO2E98ZlVcrgXTQJvmHej-PIn2kOVfBaVLRS_b_DigRK7Fw7iqviuNDuEEN8qb=w2400" },
+            { role: "Secretária", name: "Ana Luisa Batista", desc: "Responsável por manter as atas, comunicação e documentos do partido em ordem.", img: "" },
+            { role: "Diretor de Articulação", name: "Moisés Gabriel", desc: "Responsável por conectar o partido com a comunidade escolar e coordenar parcerias.", img: "" },
+            { role: "Tesoureiro", name: "Desiree", desc: "Cuida da gestão financeira com transparência e controle.", img: "" },
+            { role: "Diretorias", name: "Diretorias a Definir", desc: "Time de diretorias em formação para se integrar nos próximos passos do partido.", img: "" }
+        ];
+        let currentParty = 0;
+
+        const chapaData = [
+            { role: "Presidente da Chapa", name: "Alice Saar", desc: "Líder da chapa que conduz as propostas e representa o grupo.", img: "" },
+            { role: "Vice Presidente", name: "Maria Eliza", desc: "Braço direito da chapa, sempre pronto para apoiar e manter a equipe unida.", img: "" },
+            { role: "Secretário Geral", name: "Gabriel Reis", desc: "Organiza as informações da chapa, as atas e a comunicação interna.", img: "" },
+            { role: "1° Secretária", name: "Ana Luisa Batista", desc: "Segundo secretário para garantir redundância e eficiência nas tarefas administrativas.", img: "" },
+            { role: "Tesoureiro Geral", name: "Desiree", desc: "Zela pelos recursos financeiros da chapa com responsabilidade.", img: "" },
+            { role: "1° Tesoureiro", name: "?", desc: "Suporte adicional na gestão financeira da chapa.", img: "" },
+            { role: "Diretora de Cultura", name: "Ana Luiza", desc: "Responsável por promover atividades culturais e eventos artísticos na escola.", img: "" },
+            { role: "Diretora de Saúde e Meio Ambiente", name: "Maria Eduarda Schneider", desc: "Coordena ações de saúde e sustentabilidade escolar.", img: "" },
+            { role: "Diretora Social", name: "Alice Saar", desc: "Fomenta inclusão e bem-estar social dentro da comunidade escolar.", img: "" },
+            { role: "Diretor de Imprensa", name: "Alice", desc: "Gerencia comunicação pública e divulgação das ações do partido.", img: "" },
+            { role: "Diretor de Esportes", name: "Isabela", desc: "Organiza atividades esportivas e projetos de incentivo à prática de atividades físicas.", img: "" }
+        ];
+        let currentChapa = 0;
+
+        function updateTeamParty() {
+            const container = document.getElementById('team-party-container');
+            container.style.opacity = '0';
+            setTimeout(() => {
+                const data = partyData[currentParty];
+                document.getElementById('team-party-role').innerText = data.role;
+                document.getElementById('team-party-name').innerText = data.name;
+                document.getElementById('team-party-desc').innerText = data.desc;
+                const partyImg = document.getElementById('team-party-img');
+                if (partyImg && data.img) partyImg.src = data.img;
+                container.style.opacity = '1';
+            }, 300);
+        }
+
+        function nextTeamParty() { currentParty = (currentParty + 1) % partyData.length; updateTeamParty(); }
+        function prevTeamParty() { currentParty = (currentParty - 1 + partyData.length) % partyData.length; updateTeamParty(); }
+
+        function updateTeamChapa() {
+            const container = document.getElementById('team-chapa-container');
+            container.style.opacity = '0';
+            setTimeout(() => {
+                const data = chapaData[currentChapa];
+                document.getElementById('team-chapa-role').innerText = data.role;
+                document.getElementById('team-chapa-name').innerText = data.name;
+                document.getElementById('team-chapa-desc').innerText = data.desc;
+                const chapaImg = document.getElementById('team-chapa-img');
+                if (chapaImg && data.img) chapaImg.src = data.img;
+                container.style.opacity = '1';
+            }, 300);
+        }
+
+        function nextTeamChapa() { currentChapa = (currentChapa + 1) % chapaData.length; updateTeamChapa(); }
+        function prevTeamChapa() { currentChapa = (currentChapa - 1 + chapaData.length) % chapaData.length; updateTeamChapa(); }
+
+        // ================= DADOS DAS COMISSÕES (CARROSSEL) =================
+        const comData = [
+            { title: "Comunicação", desc: "A galera da Comunicação cuida de todo o nosso Instagram, faz oshttps cartazes espalhados pela escola e garante que todo mundo saiba das novidades.", img: "", icon: "megaphone" },
+            { title: "Eventos", desc: "Sem a Comissão de Eventos, a escola seria um tédio! Eles planejam as festas juninas, gincanas, bailes e eventos especiais do começo ao fim.", img: "", icon: "party-popper" },
+            { title: "Patrimônio", desc: "Essa galera verifica carteiras quebradas, pintura das quadras e ajuda a organizar campanhas de conscientização para manter a escola bonita.", img: "", icon: "hammer" },
+            { title: "Cultura", desc: "Música, arte, teatro e poesia! A Comissão de Cultura organiza o show de talentos, o clube do livro e traz atividades artísticas para os nossos intervalos.", img: "", icon: "palette" },
+            { title: "Outros Setores", desc: "Temos também grupos de apoio geral, como a equipe de Esportes e os representantes de sala que são a nossa voz direta dentro das turmas.", img: "", icon: "puzzle" }
+        ];
+        let currentCom = 0;
+
+        function updateCommittee() {
+            const container = document.getElementById('committee-container');
+            container.style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('com-title').innerText = comData[currentCom].title;
+                document.getElementById('com-desc').innerText = comData[currentCom].desc;
+                document.getElementById('com-img').src = comData[currentCom].img;
+                
+                const iconContainer = document.getElementById('com-icon').parentNode;
+                iconContainer.innerHTML = `<i id="com-icon" data-lucide="${comData[currentCom].icon}" class="w-6 h-6"></i>`;
+                lucide.createIcons();
+                
+                container.style.opacity = '1';
+            }, 300);
+        }
+
+        function nextCommittee() { currentCom = (currentCom + 1) % comData.length; updateCommittee(); }
+        function prevCommittee() { currentCom = (currentCom - 1 + comData.length) % comData.length; updateCommittee(); }
+
+        // ================= MODAL PROJETOS =================
+        function openProjectModal(title, description) {
+            const modal = document.getElementById('project-modal');
+            document.getElementById('project-modal-title').innerText = title;
+            document.getElementById('project-modal-desc').innerText = description;
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+
+            setTimeout(() => {
+                modal.classList.add('show');
+            }, 15);
+        }
+
+        function closeProjectModal() {
+            const modal = document.getElementById('project-modal');
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.classList.remove('flex');
+                modal.classList.add('hidden');
+            }, 280);
+        }
+
+        // Inicialização
+        window.onload = () => {
+            lucide.createIcons();
+            showTab('home');
+            updateTeamParty();
+            updateTeamChapa();
+            updateCommittee();
+            setInterval(nextMainSlide, 6000);
+        };
+    </script>
+</body>
+</html>
